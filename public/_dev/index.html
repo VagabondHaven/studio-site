@@ -40,7 +40,7 @@
 (function () {
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var day = function (s) { return s ? new Date(s).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : ''; };
-  var studio = 'https://vagabond-studio.pages.dev';
+  var studio = 'https://studio.vagabondhaven.com';
   function toast(t) { var d = document.createElement('div'); d.className = 'vs-toast'; d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 9000); }
   fetch('/_studio/hello').then(function (r) { return r.json(); }).then(function (h) { if (h.studioUrl) studio = h.studioUrl; }).catch(function () {}).then(function () {
     document.getElementById('foot').innerHTML = 'Create something new or change a creation: <a href="' + esc(studio) + '/#chat">back to Vagabond Studio</a>.';

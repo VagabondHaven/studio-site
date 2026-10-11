@@ -1,6 +1,6 @@
 {
   "about": "This site was made with Vagabond Studio. The Studio opens the developer site (/_dev/) with a signed pass; passKey is the Studio's public key that checks it.",
-  "studioUrl": "https://vagabond-studio.pages.dev",
+  "studioUrl": "https://studio.vagabondhaven.com",
   "passKey": {
     "kty": "EC",
     "crv": "P-256",

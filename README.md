@@ -1,6 +1,6 @@
 # My studio site
 
-A website made with [Vagabond Studio](https://vagabond-studio.pages.dev): flyers, posters, brochures, business cards and a whole website, created by describing them to Claude.
+A website made with [Vagabond Studio](https://studio.vagabondhaven.com): flyers, posters, brochures, business cards and a whole website, created by describing them to Claude.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/VagabondHaven/studio-site)
 
