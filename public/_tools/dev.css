@@ -1,0 +1,11 @@
+/* Developer-site bar (src/worker.js adds it). Fixed look, independent of the page's own design. */
+.vs-bar { position: fixed; top: 10px; right: 10px; z-index: 9997; display: flex; gap: 4px; align-items: center; background: rgba(28, 32, 30, .9); color: #fff;
+  border-radius: 999px; padding: 4px; font: 500 13px/1.2 system-ui, -apple-system, sans-serif; box-shadow: 0 3px 14px rgba(0,0,0,.2); }
+.vs-bar a, .vs-bar button { color: #fff; background: none; border: 0; border-radius: 999px; padding: 7px 12px; text-decoration: none; cursor: pointer; font: inherit; }
+.vs-bar a:hover, .vs-bar button:hover { background: rgba(255,255,255,.14); }
+.vs-bar .vs-main { background: #fff; color: #1c201e; font-weight: 600; }
+.vs-bar .vs-main:hover { background: #e8ebe9; }
+.vs-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10001; background: #1c201e; color: #fff; padding: 12px 18px; border-radius: 12px;
+  font: 500 14px/1.45 system-ui, sans-serif; max-width: min(92vw, 560px); box-shadow: 0 6px 24px rgba(0,0,0,.25); overflow-wrap: anywhere; }
+@media (max-width: 560px) { .vs-bar { top: auto; bottom: 64px; right: 8px; left: 8px; justify-content: space-between; } }
+@media print { .vs-bar, .vs-toast, #cm, #ds, .ds-ui, .cm-ui { display: none !important; } }
