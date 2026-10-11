@@ -4,6 +4,9 @@
   "name": "my-studio-site",
   "main": "src/worker.js",
   "compatibility_date": "2026-06-01",
+  // The free address <name>.<your-account>.workers.dev. Cloudflare sometimes leaves it switched off for new
+  // sites; this switches it on at every deploy, so the site is always reachable there.
+  "workers_dev": true,
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
