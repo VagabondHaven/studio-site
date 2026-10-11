@@ -26,9 +26,14 @@ async function readPass(env, token, host) {
   try {
     const [payload, sig] = String(token || '').split('.');
     if (!payload || !sig) return null;
-    const jwk = env.PASS_KEY_FOR_TESTS ? JSON.parse(env.PASS_KEY_FOR_TESTS) : studio.passKey;
-    const key = await crypto.subtle.importKey('jwk', { ...jwk, key_ops: ['verify'] }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
-    if (!(await crypto.subtle.verify(SIG, key, unb64u(sig), new TextEncoder().encode(payload)))) return null;
+    // The live Studio's key (passKey) and the developer copy's key (passKeys) are both accepted.
+    const jwks = env.PASS_KEY_FOR_TESTS ? [JSON.parse(env.PASS_KEY_FOR_TESTS)] : [studio.passKey].concat(studio.passKeys || []);
+    let ok = false;
+    for (const jwk of jwks) {
+      const key = await crypto.subtle.importKey('jwk', { ...jwk, key_ops: ['verify'] }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+      if (await crypto.subtle.verify(SIG, key, unb64u(sig), new TextEncoder().encode(payload))) { ok = true; break; }
+    }
+    if (!ok) return null;
     const p = JSON.parse(new TextDecoder().decode(unb64u(payload)));
     if (!(p.exp > Date.now() / 1000) || p.host !== host) return null;
     return p;
