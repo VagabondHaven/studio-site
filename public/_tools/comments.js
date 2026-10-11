@@ -106,6 +106,38 @@
     box.style.left = r.left + scrollX + 'px'; box.style.top = r.top + scrollY + 'px'; box.style.width = r.width + 'px'; box.style.height = r.height + 'px';
   }
 
+  // "Replace this picture now" (only where the site offers window.VSSwap, for example a developer site that can save):
+  // the new picture is saved right away, without asking Claude.
+  function toastMsg(t) { var d = document.createElement('div'); d.className = 'cm-toast cm-ui'; d.textContent = t; ui.appendChild(d); setTimeout(function () { d.remove(); }, 5000); }
+  function swapImage(img, f, say) {
+    if (!f || !/^image\//.test(f.type)) return Promise.reject(new Error('Only pictures can be used.'));
+    say('Saving the new picture...');
+    return shrink(f, 2000, 'image/jpeg', 0.86).then(function (r) {
+      return window.VSSwap({ img: img, page: location.pathname, oldSrc: img.getAttribute('src') || '', data: r.data, name: f.name || 'picture' }).then(function (res) {
+        img.removeAttribute('srcset'); img.src = r.data;
+        if (res && res.note) toastMsg(res.note);
+        return res;
+      });
+    });
+  }
+  // In comment mode a picture file dropped straight onto a picture on the page replaces it.
+  var dropImg = null;
+  function canSwap() { return on && typeof window.VSSwap === 'function'; }
+  document.addEventListener('dragover', function (e) {
+    if (!canSwap() || isUi(e.target)) return;
+    var img = imageOf(e.target); if (!img || !e.dataTransfer || [].indexOf.call(e.dataTransfer.types || [], 'Files') < 0) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+    if (dropImg !== img) { if (dropImg) dropImg.classList.remove('cm-drop-target'); dropImg = img; img.classList.add('cm-drop-target'); }
+  });
+  document.addEventListener('dragleave', function (e) { if (dropImg && e.target === dropImg) { dropImg.classList.remove('cm-drop-target'); dropImg = null; } });
+  document.addEventListener('drop', function (e) {
+    if (!canSwap() || isUi(e.target)) return;
+    var img = imageOf(e.target); if (!img) return;
+    e.preventDefault(); if (dropImg) dropImg.classList.remove('cm-drop-target'); dropImg = null;
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    swapImage(img, f, toastMsg).catch(function (err) { toastMsg(err.message); });
+  });
+
   function setMode(v) {
     on = v; btn.setAttribute('aria-pressed', v); bar.hidden = !v; bar.classList.remove('cm-mini'); document.documentElement.classList.toggle('cm-on', v);
     hover.hidden = true; if (!v) { closePop(); list.hidden = true; }
@@ -151,33 +183,30 @@
       : textEl ? '<blockquote>' + esc(textEl.innerText.trim().slice(0, 200)) + (textEl.innerText.length > 200 ? ' ...' : '') + '</blockquote>' : '';
     pop.innerHTML = '<div class="cm-h">' + (img ? 'Picture' : o.highlight ? 'Highlighted text' : 'Element') + ' <span>' + esc(view()) + ' view</span><button type="button" class="cm-x" aria-label="Close">' + XSVG + '</button></div>' + quote +
       '<textarea class="cm-text" rows="3" placeholder="' + (img ? 'What should change? For a new picture, add it below.' : 'Your comment') + '"></textarea>' +
-      (img && typeof window.VSSwap === 'function' ? '<div class="cm-swap"><label class="cm-swap-btn">Replace this picture now<input type="file" accept="image/*" hidden></label><span class="cm-note">Swaps it right away, without asking Claude.</span></div>' : '') +
+      (img && typeof window.VSSwap === 'function' ? '<div class="cm-swap"><label class="cm-swap-btn">Replace this picture now<input type="file" accept="image/*" hidden></label><span class="cm-note">Choose a picture or drop it here. It is swapped right away, without asking Claude.</span></div>' : '') +
       '<div class="cm-att" tabindex="0"><span>Add pictures: drop, paste or <label class="cm-att-pick">choose<input type="file" accept="image/*" multiple hidden></label></span><div class="cm-att-list"></div></div>' +
       (textEl ? '<button type="button" class="cm-edit">Edit the text on the page</button><p class="cm-note cm-edit-note" hidden>Type the new wording directly on the page, then press Save.</p>' : '') +
-      '<input class="cm-name" type="text" placeholder="Your name" autocomplete="name">' +
       '<div class="cm-acts"><button type="button" class="cm-save">Save comment</button><button type="button" class="cm-cancel">Cancel</button></div><p class="cm-msg" aria-live="polite"></p>';
     pop.hidden = false; position(o.x, o.y);
     pop.querySelector('.cm-x').onclick = pop.querySelector('.cm-cancel').onclick = closePop;
     pop.querySelector('.cm-save').onclick = save;
-    pop.querySelector('.cm-name').value = store.get('vs-cm-name') || '';
     var ed = pop.querySelector('.cm-edit');
     if (ed) ed.onclick = function () {
       pending.edited = true; el.setAttribute('contenteditable', 'true'); el.classList.add('cm-editing'); el.focus();
       ed.hidden = true; pop.querySelector('.cm-edit-note').hidden = false;
     };
     // "Replace this picture now": only when the site offers it (window.VSSwap, for example a developer site that can save).
-    var sw = pop.querySelector('.cm-swap input');
-    if (sw) sw.onchange = function () {
-      var f = sw.files[0], msg = pop.querySelector('.cm-msg'), p = pending; if (!f) return;
-      msg.textContent = 'Saving the new picture...';
-      shrink(f, 2000, 'image/jpeg', 0.86).then(function (r) {
-        return window.VSSwap({ img: img, page: location.pathname, oldSrc: img.getAttribute('src') || '', data: r.data, name: f.name || 'picture' }).then(function (res) {
-          img.removeAttribute('srcset'); img.src = r.data;
-          if (pending === p) closePop();
-          if (res && res.note) { var t = document.createElement('div'); t.className = 'cm-toast cm-ui'; t.textContent = res.note; ui.appendChild(t); setTimeout(function () { t.remove(); }, 5000); }
-        });
-      }).catch(function (err) { if (pending === p) msg.textContent = err.message; });
+    var sw = pop.querySelector('.cm-swap input'), swBox = pop.querySelector('.cm-swap');
+    var doSwap = function (f) {
+      var msg = pop.querySelector('.cm-msg'), p = pending;
+      swapImage(img, f, function (t) { msg.textContent = t; }).then(function () { if (pending === p) closePop(); }, function (err) { if (pending === p) msg.textContent = err.message; });
     };
+    if (sw) {
+      sw.onchange = function () { doSwap(sw.files[0]); sw.value = ''; };
+      swBox.addEventListener('dragover', function (e) { e.preventDefault(); e.stopPropagation(); swBox.classList.add('over'); });
+      swBox.addEventListener('dragleave', function () { swBox.classList.remove('over'); });
+      swBox.addEventListener('drop', function (e) { e.preventDefault(); e.stopPropagation(); swBox.classList.remove('over'); doSwap(e.dataTransfer.files[0]); });
+    }
     var att = pop.querySelector('.cm-att'), ai = att.querySelector('input');
     ai.onchange = function () { [].forEach.call(ai.files, addAttachment); ai.value = ''; };
     att.addEventListener('dragover', function (e) { e.preventDefault(); att.classList.add('over'); });
@@ -217,8 +246,7 @@
     var p = pending, msg = pop.querySelector('.cm-msg'), comment = pop.querySelector('.cm-text').value.trim();
     var newText = p.edited && p.el.innerText.trim() !== p.originalText ? p.el.innerText.trim() : '';
     if (!comment && !newText && !p.attachments.length) { msg.textContent = 'Write a comment, edit the text or add a picture first.'; return; }
-    var el = p.el, idEl = el.closest('[id]'), who = pop.querySelector('.cm-name').value.trim();
-    if (who) store.set('vs-cm-name', who);
+    var el = p.el, idEl = el.closest('[id]'), who = store.get('vs-cm-name') || '';
     var body = { author: who, page: page, lang: document.documentElement.lang, view: view(), width: innerWidth, selector: cssPath(el), elementId: idEl ? idEl.id : '',
       tag: el.tagName.toLowerCase(), elementText: (el.innerText || '').trim().slice(0, 600) || p.imgSrc, highlight: p.highlight, comment: comment, newText: newText,
       x: p.x, y: p.y, attachments: p.attachments };

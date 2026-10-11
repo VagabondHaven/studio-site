@@ -94,5 +94,11 @@
   .cm-swap { display: grid; gap: 4px; margin: 0 0 8px; }
   .cm-swap-btn { display: block; text-align: center; padding: 8px; border-radius: 6px; background: var(--cm-accent); color: var(--cm-on-accent); cursor: pointer; font: 600 13px system-ui, sans-serif; }
   .cm-swap .cm-note { margin: 0; }
+  .cm-swap.over .cm-swap-btn { outline: 2px dashed var(--cm-accent); outline-offset: 3px; }
+  .cm-on img.cm-drop-target { outline: 3px dashed var(--cm-accent); outline-offset: -3px; }
   .cm-toast { position: fixed; left: 50%; bottom: 70px; transform: translateX(-50%); z-index: 10000; background: var(--cm-dark); color: var(--cm-on-dark);
     padding: 10px 16px; border-radius: 10px; font: 500 13px/1.4 system-ui, sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,.25); max-width: calc(100vw - 32px); }
+
+  /* Space between "Edit the text on the page" and the Save buttons */
+  .cm-pop > .cm-edit { display: block; width: 100%; margin: 2px 0 12px; }
+  .cm-pop > .cm-edit-note { margin: 0 0 12px; }
