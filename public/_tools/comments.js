@@ -49,6 +49,7 @@
     var lum = function (c) { return c.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce(function (a, v, i) { return a + v * [0.2126, 0.7152, 0.0722][i]; }, 0); };
     var on = function (c) { return (1.05) / (lum(c) + 0.05) >= 3 ? '#ffffff' : '#1a1a1a'; }; // white text unless the colour is too light
     var rgb = function (c, a) { return a == null ? 'rgb(' + c.join(',') + ')' : 'rgba(' + c.join(',') + ',' + a + ')'; };
+    if (lum(light) < 0.6) light = [239, 235, 227]; // a dark page: the light tint behind quoted text stays light, so the dark text in it stays readable
     var v = { '--cm-dark': rgb(dark), '--cm-on-dark': on(dark), '--cm-light': rgb(light), '--cm-accent': rgb(accent), '--cm-on-accent': on(accent), '--cm-hover': rgb(dark, 0.08) };
     for (var k in v) ui.style.setProperty(k, v[k]);
   })();

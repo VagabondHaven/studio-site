@@ -33,7 +33,7 @@
 </style>
 </head>
 <body>
-<header><div class="in"><h1>My creations</h1><p>Your developer site: only you can see it. Open a creation to comment on it, swap pictures, try fonts and colours, print it or save it as a PDF. "Publish" puts it on your live site for everyone.</p></div></header>
+<header><div class="in"><h1>My creations</h1><p>Your developer site: only you can see it. Open a creation to comment on it, swap pictures, try fonts and colours, print it, save it as a PDF, or publish it on your live site for everyone.</p></div></header>
 <main><div class="grid" id="grid"></div></main>
 <footer><p id="foot"></p></footer>
 <script>
@@ -54,7 +54,7 @@
       return '<article class="card"><a class="thumb" href="' + href + '" aria-label="Open ' + esc(c.title) + '"><iframe src="' + href + '?thumb=1" loading="lazy" tabindex="-1" title=""></iframe></a>' +
         '<div class="body"><h2>' + esc(c.title || c.slug) + '</h2><p class="meta">' + esc(c.kind || '') + (c.size && c.size !== 'screen' ? ', ' + esc(c.size) : '') + ' · changed ' + day(c.updated) + '</p>' +
         '<p class="status' + (c.published ? ' live' : '') + '">' + (c.published ? 'On the live site since ' + day(c.published) + (c.updated > c.published ? ', with newer changes not published yet' : '') : 'Not published') + '</p>' +
-        '<div class="acts"><a class="btn" href="' + href + '">Open</a><button class="btn main" type="button" data-pub="' + esc(c.slug) + '">Publish</button>' + (c.published ? '<a class="btn" href="' + live + '" target="_blank" rel="noopener">Live</a>' : '') + '</div></div></article>';
+        '<div class="acts"><a class="btn main" href="' + href + '">Open</a>' + (c.published ? '<a class="btn" href="' + live + '" target="_blank" rel="noopener">Live</a>' : '') + '</div></div></article>';
     }).join('');
   }).catch(function () { document.getElementById('grid').innerHTML = '<p class="empty">Could not load the list.</p>'; });
   document.addEventListener('click', function (e) {

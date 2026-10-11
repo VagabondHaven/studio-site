@@ -120,12 +120,21 @@
     return o;
   })();
   // The panel's own fixed look, from the site as built (its brand), never from the design being tested.
+  // A dark page (light text on a dark background, like a night-time poster) would make the panel unreadable: its
+  // fields are white. Then the panel keeps light neutral surfaces and takes only the brand's dark and accent colours,
+  // and only where they are readable.
   (function () {
-    var white = '#ffffff', onAcc = contrast(white, AB.accent) >= 3 ? white : AB.text, onDark = contrast(AB.bg, AB.dark) >= 4.5 ? AB.bg : white;
-    var v = { '--ds-dark': AB.dark, '--ds-dark-2': mix(AB.dark, '#000000', 0.8), '--ds-on-dark': onDark, '--ds-on-dark-2': mix(onDark, AB.dark, 0.75),
-      '--ds-bg': AB.bg, '--ds-light': AB.light, '--ds-light-2': mix(AB.light, AB.text, 0.85), '--ds-line': mix(AB.light, AB.text, 0.78),
-      '--ds-accent': AB.accent, '--ds-accent-2': mix(AB.accent, '#000000', 0.85), '--ds-on-accent': onAcc,
-      '--ds-text': AB.text, '--ds-muted': contrast(AB.muted, AB.bg) >= 4.5 ? AB.muted : mix(AB.text, AB.bg, 0.8), '--ds-white': white,
+    var white = '#ffffff';
+    var lightPage = lum(AB.bg) > 0.5 && contrast(AB.text, white) >= 7 && contrast(AB.text, AB.light) >= 4.5;
+    var bg = lightPage ? AB.bg : '#faf8f4', light = lightPage ? AB.light : '#efebe3', text = lightPage ? AB.text : '#1f2422';
+    var muted = lightPage && contrast(AB.muted, AB.bg) >= 4.5 ? AB.muted : mix(text, bg, 0.72);
+    var dark = contrast(AB.dark, light) >= 4.5 && contrast(AB.dark, white) >= 4.5 ? AB.dark : (contrast(AB.text, white) >= 7 ? AB.text : '#2b3330');
+    var accent = contrast(AB.accent, white) >= 3 ? AB.accent : mix(AB.accent, '#000000', 0.6);
+    var onAcc = contrast(white, accent) >= 3 ? white : text, onDark = contrast(bg, dark) >= 4.5 ? bg : white;
+    var v = { '--ds-dark': dark, '--ds-dark-2': mix(dark, '#000000', 0.8), '--ds-on-dark': onDark, '--ds-on-dark-2': mix(onDark, dark, 0.75),
+      '--ds-bg': bg, '--ds-light': light, '--ds-light-2': mix(light, text, 0.85), '--ds-line': mix(light, text, 0.78),
+      '--ds-accent': accent, '--ds-accent-2': mix(accent, '#000000', 0.85), '--ds-on-accent': onAcc,
+      '--ds-text': text, '--ds-muted': muted, '--ds-white': white,
       '--ds-font': AB.body, '--ds-head': AB.head };
     for (var k in v) box.style.setProperty(k, v[k]);
   })();

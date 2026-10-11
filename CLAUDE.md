@@ -6,7 +6,7 @@ This site was made with Vagabond Studio. The owner is not technical: write to th
 
 - Live site: `public/` (open to everyone). Developer site: `public/_dev/` (only the owner, behind a pass; see `src/worker.js`).
 - Each creation is a folder in `public/_dev/` with an `index.html` (one HTML file with its CSS inside for single pages). The website is `public/_dev/website/` (home `index.html`, pages as folders like `about/index.html`, one shared `style.css`).
-- Pictures: `public/_dev/media/`. Fonts: `public/_fonts/fonts.css` (Playfair Display, Lora, Cormorant Garamond, DM Serif Display, Lato, Inter, Montserrat, Nunito, Raleway, Josefin Sans, Poppins, Caveat).
+- Pictures: `public/_dev/media/`. The editing tools in `public/_tools/` and the "My creations" page `public/_dev/index.html` are kept up to date by Vagabond Studio: never change them here. Fonts: `public/_fonts/fonts.css` (Playfair Display, Lora, Cormorant Garamond, DM Serif Display, Lato, Inter, Montserrat, Nunito, Raleway, Josefin Sans, Poppins, Caveat).
 - `public/_dev/creations.json`: the list on "My creations" ({slug, title, kind, size, updated, published, publishedFiles}). Update it whenever you add or change a creation.
 
 ## How to make and change things
