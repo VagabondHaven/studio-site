@@ -54,7 +54,7 @@
       return '<article class="card"><a class="thumb" href="' + href + '" aria-label="Open ' + esc(c.title) + '"><iframe src="' + href + '?thumb=1" loading="lazy" tabindex="-1" title=""></iframe></a>' +
         '<div class="body"><h2>' + esc(c.title || c.slug) + '</h2><p class="meta">' + esc(c.kind || '') + (c.size && c.size !== 'screen' ? ', ' + esc(c.size) : '') + ' · changed ' + day(c.updated) + '</p>' +
         '<p class="status' + (c.published ? ' live' : '') + '">' + (c.published ? 'On the live site since ' + day(c.published) + (c.updated > c.published ? ', with newer changes not published yet' : '') : 'Not published') + '</p>' +
-        '<div class="acts"><a class="btn main" href="' + href + '">Open</a>' + (c.published ? '<a class="btn" href="' + live + '" target="_blank" rel="noopener">Live</a>' : '') + '</div></div></article>';
+        '<div class="acts"><a class="btn main" href="' + href + '">Open</a><a class="btn" href="' + esc(studio) + '/?chat=' + encodeURIComponent(c.slug) + '">Talk to Claude</a>' + (c.published ? '<a class="btn" href="' + live + '" target="_blank" rel="noopener">Live</a>' : '') + '</div></div></article>';
     }).join('');
   }).catch(function () { document.getElementById('grid').innerHTML = '<p class="empty">Could not load the list.</p>'; });
   document.addEventListener('click', function (e) {
