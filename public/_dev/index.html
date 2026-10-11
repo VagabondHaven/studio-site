@@ -27,6 +27,8 @@
   .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .btn { font-family: var(--f7, 'Lato', system-ui, sans-serif); font-size: calc(14.5px * var(--s7, 1)); font-weight: 600; border-radius: 999px; padding: 7px 15px; border: 1.5px solid var(--dark); background: #fff; color: var(--dark); text-decoration: none; cursor: pointer; }
   .btn.main { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .ren { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ren input { flex: 1 1 100%; min-width: 0; font-family: var(--f4, 'Lato', system-ui, sans-serif); font-size: calc(17px * var(--s4, 1)); padding: 6px 10px; border: 1.5px solid var(--dark); border-radius: 10px; color: var(--text); }
   .empty { background: #fff; border: 1.5px dashed var(--line); border-radius: 18px; padding: 28px; max-width: 640px; }
   .empty a { color: var(--dark); }
   footer { max-width: 1120px; margin: 0 auto; padding: 0 20px 40px; }
@@ -52,11 +54,33 @@
       var href = c.slug + '/';
       var live = c.slug === 'website' ? '/' : '/' + c.slug + '/';
       return '<article class="card"><a class="thumb" href="' + href + '" aria-label="Open ' + esc(c.title) + '"><iframe src="' + href + '?thumb=1" loading="lazy" tabindex="-1" title=""></iframe></a>' +
-        '<div class="body"><h2>' + esc(c.title || c.slug) + '</h2><p class="meta">' + esc(c.kind || '') + (c.size && c.size !== 'screen' ? ', ' + esc(c.size) : '') + ' · changed ' + day(c.updated) + '</p>' +
+        '<div class="body"><h2 data-slug="' + esc(c.slug) + '">' + esc(c.title || c.slug) + '</h2><p class="meta">' + esc(c.kind || '') + (c.size && c.size !== 'screen' ? ', ' + esc(c.size) : '') + ' · changed ' + day(c.updated) + '</p>' +
         '<p class="status' + (c.published ? ' live' : '') + '">' + (c.published ? 'On the live site since ' + day(c.published) + (c.updated > c.published ? ', with newer changes not published yet' : '') : 'Not published') + '</p>' +
-        '<div class="acts"><a class="btn main" href="' + href + '">Open</a><a class="btn" href="' + esc(studio) + '/?chat=' + encodeURIComponent(c.slug) + '">Talk to Claude</a>' + (c.published ? '<a class="btn" href="' + live + '" target="_blank" rel="noopener">Live</a>' : '') + '</div></div></article>';
+        '<div class="acts"><a class="btn main" href="' + href + '">Open</a><a class="btn" href="' + esc(studio) + '/?chat=' + encodeURIComponent(c.slug) + '">Talk to Claude</a><button type="button" class="btn" data-ren="' + esc(c.slug) + '">Rename</button>' + (c.published ? '<a class="btn" href="' + live + '" target="_blank" rel="noopener">Live</a>' : '') + '</div></div></article>';
     }).join('');
   }).catch(function () { document.getElementById('grid').innerHTML = '<p class="empty">Could not load the list.</p>'; });
+  // Rename: only the name changes (here and in the Studio's "Chat about"); the address stays, so links keep working.
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ren]'); if (!b) return;
+    var card = b.closest('.card'), h = card.querySelector('h2'), slug = b.dataset.ren, old = h.textContent;
+    if (card.querySelector('.ren')) return;
+    var f = document.createElement('form'); f.className = 'ren';
+    f.innerHTML = '<input aria-label="New name" maxlength="80"><button class="btn main" type="submit">Save</button><button class="btn" type="button">Cancel</button>';
+    var inp = f.querySelector('input'); inp.value = old;
+    h.hidden = true; h.after(f); inp.focus(); inp.select();
+    var done = function () { f.remove(); h.hidden = false; };
+    f.querySelector('button[type=button]').onclick = done;
+    inp.addEventListener('keydown', function (k) { if (k.key === 'Escape') done(); });
+    f.onsubmit = function (k) {
+      k.preventDefault();
+      var name = inp.value.replace(/\s+/g, ' ').trim();
+      if (!name || name === old) { done(); return; }
+      f.querySelector('button[type=submit]').disabled = true;
+      fetch('/api/publish', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slug: slug, rename: name }) }).then(function (r) { return r.json(); })
+        .then(function (j) { if (j.error) { toast(j.error); f.querySelector('button[type=submit]').disabled = false; return; } h.textContent = j.title || name; done(); toast('Renamed. The address stays the same.'); },
+          function () { toast('No connection. Please try again.'); f.querySelector('button[type=submit]').disabled = false; });
+    };
+  });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-pub]'); if (!b) return;
     if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'Publish for everyone?'; setTimeout(function () { b.dataset.sure = ''; b.textContent = 'Publish'; }, 4000); return; }

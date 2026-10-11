@@ -11,6 +11,7 @@
 .vs-bar .vs-main { background: #fff; color: #1c201e; font-weight: 600; margin: 2px 0; }
 .vs-bar .vs-main:hover { background: #e8ebe9; }
 .vs-bar .vs-help { color: rgba(255,255,255,.75); font-size: 13px; border-top: 1px solid rgba(255,255,255,.14); border-radius: 0 0 10px 10px; margin-top: 2px; }
+.vs-bar .vs-fb { border-top: 0; margin-top: 0; }
 .vs-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 10001; background: #1c201e; color: #fff; padding: 12px 18px; border-radius: 12px;
   font: 500 14px/1.45 system-ui, sans-serif; max-width: min(92vw, 560px); box-shadow: 0 6px 24px rgba(0,0,0,.25); overflow-wrap: anywhere; }
 @media (max-width: 639px) { .vs-open { top: auto; bottom: 102px; left: 10px; width: 40px; height: 40px; } }
