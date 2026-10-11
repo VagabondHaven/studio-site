@@ -30,12 +30,15 @@
   open.title = 'My creations, Print, Save as PDF, Publish'; open.setAttribute('aria-label', open.title); open.innerHTML = IC;
   var bar = document.createElement('div');
   bar.className = 'vs-bar'; bar.hidden = true; bar.setAttribute('role', 'menu');
-  bar.innerHTML = '<a href="/_dev/" role="menuitem">My creations</a><a href="#" class="vs-talk" role="menuitem">Talk to Claude about this</a><button type="button" data-a="print" role="menuitem">Print</button><button type="button" data-a="pdf" role="menuitem">Save as PDF</button><button type="button" data-a="publish" class="vs-main" role="menuitem">Publish</button><button type="button" data-a="help" class="vs-help" role="menuitem">How this page works</button>';
+  bar.innerHTML = '<a href="/_dev/" role="menuitem">My creations</a><a href="#" class="vs-talk" role="menuitem">Talk to Claude about this</a><button type="button" data-a="print" role="menuitem">Print</button><button type="button" data-a="pdf" role="menuitem">Save as PDF</button><button type="button" data-a="publish" class="vs-main" role="menuitem">Publish</button><button type="button" data-a="help" class="vs-help" role="menuitem">How this page works</button><a href="#" class="vs-help vs-fb" role="menuitem">Send feedback</a>';
   document.body.appendChild(open); document.body.appendChild(bar);
   // "Talk to Claude about this": this creation's own conversation in the Studio.
   var talk = bar.querySelector('.vs-talk'), studio = 'https://studio.vagabondhaven.com';
-  talk.href = studio + '/?chat=' + encodeURIComponent(slug);
-  fetch('/_studio/hello').then(function (r) { return r.json(); }).then(function (h) { if (h.studioUrl) talk.href = h.studioUrl + '/?chat=' + encodeURIComponent(slug); }).catch(function () {});
+  // "Send feedback": the feedback window in the Studio, noting which creation it came from.
+  var fbl = bar.querySelector('.vs-fb');
+  var links = function (base) { talk.href = base + '/?chat=' + encodeURIComponent(slug); fbl.href = base + '/?feedback=1&from=' + encodeURIComponent(slug); };
+  links(studio);
+  fetch('/_studio/hello').then(function (r) { return r.json(); }).then(function (h) { if (h.studioUrl) links(h.studioUrl); }).catch(function () {});
   function menu(on) {
     bar.hidden = !on; open.setAttribute('aria-expanded', String(on)); open.classList.toggle('on', on);
     if (on) { var r = open.getBoundingClientRect(), h = bar.offsetHeight; bar.style.left = (r.right + 10) + 'px'; bar.style.top = Math.max(10, Math.min(r.top + r.height / 2 - h / 2, innerHeight - h - 10)) + 'px'; }
@@ -68,15 +71,15 @@
     en: { next: 'Next', done: 'Got it', skip: 'Skip', steps: [
       ['#ds .ds-open', 'Fonts and colours', 'Try other fonts and colours on your creation here. Nothing changes for good while you try. When you like a look, press "Make this the standard design", and Claude makes it permanent.'],
       ['.cm-open', 'Comments', 'Press this, then click any text or picture and write what should change. You can also swap a picture right away. When you are done, tell Claude in the chat: "I left comments, please make the changes."'],
-      ['.vs-open', 'Your creation', 'This button opens a small menu. "My creations" lists everything you have made. "Talk to Claude about this" opens this creation\'s own conversation in the Studio. "Print" and "Save as PDF" are for paper or sending it on. "Publish" puts this creation on your live site, for everyone to see.']] },
+      ['.vs-open', 'Your creation', 'This button opens a small menu. "My creations" lists everything you have made. "Talk to Claude about this" opens this creation\'s own conversation in the Studio. "Print" and "Save as PDF" are for paper or sending it on. "Publish" puts this creation on your live site, for everyone to see. "Send feedback" tells Manu what works and what doesn\'t.']] },
     sv: { next: 'Nästa', done: 'Uppfattat', skip: 'Hoppa över', steps: [
       ['#ds .ds-open', 'Typsnitt och färger', 'Här provar du andra typsnitt och färger på det du skapat. Inget ändras för gott medan du provar. När du gillar ett utseende trycker du på "Make this the standard design", så gör Claude det permanent.'],
       ['.cm-open', 'Kommentarer', 'Tryck här och klicka sedan på valfri text eller bild och skriv vad som ska ändras. Du kan också byta en bild direkt. När du är klar skriver du till Claude i chatten: "Jag har lämnat kommentarer, gör ändringarna."'],
-      ['.vs-open', 'Det du skapat', 'Den här knappen öppnar en liten meny. "My creations" visar allt du har gjort. "Talk to Claude about this" öppnar samtalet om just det här i Studion. "Print" och "Save as PDF" är för papper eller för att skicka vidare. "Publish" lägger ut det här på din livesida, så att alla kan se det.']] },
+      ['.vs-open', 'Det du skapat', 'Den här knappen öppnar en liten meny. "My creations" visar allt du har gjort. "Talk to Claude about this" öppnar samtalet om just det här i Studion. "Print" och "Save as PDF" är för papper eller för att skicka vidare. "Publish" lägger ut det här på din livesida, så att alla kan se det. "Send feedback" berättar för Manu vad som fungerar och vad som inte gör det.']] },
     de: { next: 'Weiter', done: 'Verstanden', skip: 'Überspringen', steps: [
       ['#ds .ds-open', 'Schriften und Farben', 'Hier probierst du andere Schriften und Farben für deine Kreation aus. Solange du probierst, ändert sich nichts dauerhaft. Wenn dir ein Look gefällt, drück auf "Make this the standard design", und Claude macht ihn dauerhaft.'],
       ['.cm-open', 'Kommentare', 'Drück hier, dann klick auf einen Text oder ein Bild und schreib, was sich ändern soll. Ein Bild kannst du auch gleich austauschen. Wenn du fertig bist, schreib Claude im Chat: "Ich habe Kommentare hinterlassen, bitte setz sie um."'],
-      ['.vs-open', 'Deine Kreation', 'Dieser Knopf öffnet ein kleines Menü. "My creations" zeigt alles, was du gemacht hast. "Talk to Claude about this" öffnet das Gespräch zu genau dieser Kreation im Studio. "Print" und "Save as PDF" sind für Papier oder zum Weiterschicken. "Publish" stellt diese Kreation auf deine Live-Seite, für alle sichtbar.']] }
+      ['.vs-open', 'Deine Kreation', 'Dieser Knopf öffnet ein kleines Menü. "My creations" zeigt alles, was du gemacht hast. "Talk to Claude about this" öffnet das Gespräch zu genau dieser Kreation im Studio. "Print" und "Save as PDF" sind für Papier oder zum Weiterschicken. "Publish" stellt diese Kreation auf deine Live-Seite, für alle sichtbar. Mit "Send feedback" sagst du Manu, was gut läuft und was nicht.']] }
   };
   var tx = TXT[L] || TXT.en, KEY = 'vs-tour-seen';
   function tour() {
