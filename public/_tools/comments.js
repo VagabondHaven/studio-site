@@ -60,7 +60,7 @@
   var page = location.pathname.replace(/\.html$/, '').replace(/\/(index)?$/, '') || '/';
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
-  function isUi(el) { return !el || !el.closest || el.closest('.cm-ui, .ds-ui'); }
+  function isUi(el) { return !el || !el.closest || el.closest('.cm-ui, .ds-ui, .vs-open, .vs-bar, .vs-tip, .vs-toast'); }
   function view() { var w = innerWidth; return w >= 1025 ? 'desktop' : w >= 640 ? 'tablet' : 'phone'; }
   function post(qs, body) {
     return fetch(API + qs, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) })
